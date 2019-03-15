@@ -1,8 +1,11 @@
 # Manageable
 
-A new Flutter application that will make your life more easier!
+A minimalist application that will make your life more easier!
 
 ## Getting Started
 
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+### Android
+Register Firebase services and put your google-services.json to android/app/ folder.
+
+### iOS
+Not tested yet.
