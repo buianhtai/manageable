@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:manageable/common/constants.dart';
@@ -17,7 +18,23 @@ class StuffView extends StatefulWidget {
 class StuffViewState extends State<StuffView> {
   Stuff stuff;
 
+  String imageDownloadUrl;
+
   StuffViewState(this.stuff);
+
+  @override
+  void initState() {
+    super.initState();
+
+    if(this.stuff.picture != null) {
+      FirebaseStorage.instance.ref().child(stuff.picture).getDownloadURL().then((onValue) {
+        setState(() {
+          print(onValue);
+          imageDownloadUrl = onValue;
+        });
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,22 +52,35 @@ class StuffViewState extends State<StuffView> {
           ),
         ],
       ),
-      body: Container(
-        margin: const EdgeInsets.all(20.0),
-        child: Column(
-          verticalDirection: VerticalDirection.down,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(stuff.description != null ? stuff.description : ''),
-            Text(stuff.category != null ? stuff.category : ''),
-            Text(stuff.tags.join(', ')),
-            Text(stuff.boughtDate != null
-                ? DateFormat(DATE_FORMAT).format(DateTime.fromMicrosecondsSinceEpoch(stuff.boughtDate))
-                : ''),
-            Text(stuff.price != null ? stuff.price.toString() : '')
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            verticalDirection: VerticalDirection.down,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(stuff.description != null ? stuff.description : ''),
+              Text('Category: ' + stuff.category != null ? stuff.category : ''),
+              Text("Tags: ${stuff.tags.join(', ')}"),
+              Text(stuff.boughtDate != null
+                  ? 'Bought date: ' + DateFormat(DATE_FORMAT).format(DateTime.fromMicrosecondsSinceEpoch(stuff.boughtDate))
+                  : 'Bought date: '),
+              Text(stuff.price != null
+                  ? 'Price: ' + stuff.price.toString()
+                  : 'Price: '),
+              imageDownloadUrl == null ? Container()
+                  : Image.network(imageDownloadUrl),
+            ],
+          ),
         ),
-      )
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.nature_people), title: Text('Donate'), backgroundColor: Colors.blue),
+          BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet), title: Text('Sell'), backgroundColor: Colors.green),
+          BottomNavigationBarItem(icon: Icon(Icons.delete), title: Text('Delete'), backgroundColor: Colors.red),
+        ],
+      ),
     );
   }
 }

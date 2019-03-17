@@ -9,9 +9,7 @@ import 'package:manageable/stuff/detail.dart';
 import 'package:manageable/stuff/service.dart' as service;
 
 class StuffHomePage extends StatefulWidget {
-  final String title;
-
-  StuffHomePage({Key key, this.title}) : super(key: key);
+  StuffHomePage({Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => StuffHomeState();
@@ -20,11 +18,17 @@ class StuffHomePage extends StatefulWidget {
 class StuffHomeState extends State<StuffHomePage> {
   var stuffStream;
 
+  StuffHomeState();
+
   @override
   void initState() {
     super.initState();
 
-    service.getStuffs().then((result) {
+    load(null);
+  }
+
+  load(category) {
+    service.getStuffs(category).then((result) {
       setState(() {
         stuffStream = result;
       });
@@ -57,7 +61,7 @@ class StuffHomeState extends State<StuffHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Stuffs'),
+        title: Text('My Stuffs'),
         actions: <Widget>[
           IconButton(icon: Icon(Icons.add), iconSize: 30,
             onPressed: () {
@@ -68,7 +72,7 @@ class StuffHomeState extends State<StuffHomePage> {
           ),
         ],
       ),
-      drawer: StuffMenu(),
+      drawer: StuffMenu(notifyCategoryChange: load),
       body: futureBuilder,
     );
   }

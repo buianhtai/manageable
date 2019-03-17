@@ -2,14 +2,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:manageable/globals.dart' as globals;
 import 'package:manageable/core/db.dart' as db;
 
-getStuffs () async {
-  return db.user(globals.email).collection('stuffs').snapshots();
+final String COLLT = 'stuffs';
+
+getStuffs (category) async {
+  if(category == null) {
+    return Firestore.instance.collection(COLLT)
+        .where('uid', isEqualTo: globals.email)
+        .snapshots();
+  }
+  return Firestore.instance.collection(COLLT)
+      .where('uid', isEqualTo: globals.email)
+      .where('category', isEqualTo: category)
+      .snapshots();
 }
 
-createStuff(Map<String, dynamic> data) {
-  db.user(globals.email).collection('stuffs').document().setData(data);
+Future<DocumentReference> createStuff(Map<String, dynamic> data) {
+  data['uid'] = globals.email;
+  return Firestore.instance.collection(COLLT).add(data);
 }
 
-updateStuff(String path, Map<String, dynamic> data) {
-  Firestore.instance.document(path).updateData(data);
+Future<void> updateStuff(String path, Map<String, dynamic> data) {
+  return Firestore.instance.document(path).updateData(data);
 }

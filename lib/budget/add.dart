@@ -192,12 +192,12 @@ class StatementAddWidgetState extends State<StatementAddWidget> {
           ),
         ),
       ),
-//      bottomNavigationBar: BottomNavigationBar(
-//        items: <BottomNavigationBarItem>[
-//          BottomNavigationBarItem(icon: Icon(Icons.cancel), title: Text('Cancle'), backgroundColor: Colors.red),
-//          BottomNavigationBarItem(icon: Icon(Icons.save), title: Text('Save'), backgroundColor: Colors.green),
-//        ],
-//      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.cancel), title: Text('Cancel'), backgroundColor: Colors.red),
+          BottomNavigationBarItem(icon: Icon(Icons.save), title: Text('Save'), backgroundColor: Colors.green),
+        ],
+      ),
     );
   }
 

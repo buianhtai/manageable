@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:manageable/stuff/detail.dart';
+import 'package:manageable/stuff/edit.dart';
 import 'package:manageable/stuff/stuff.dart';
 
 
@@ -32,18 +33,20 @@ class StuffRow extends StatelessWidget {
       ),
       secondaryActions: <Widget>[
         IconSlideAction(
-            caption: 'View',
-            color: Colors.black45,
-            icon: Icons.remove_red_eye,
-            onTap: () => {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => StuffView(stuff: stuff)))
-            }
+          caption: 'View',
+          color: Colors.black45,
+          icon: Icons.remove_red_eye,
+          onTap: () => {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => StuffView(stuff: stuff)))
+          }
         ),
         IconSlideAction(
-          caption: 'Delete',
-          color: Colors.red,
-          icon: Icons.delete,
-          onTap: () => {}
+          caption: 'Edit',
+          color: Colors.yellow,
+          icon: Icons.edit,
+          onTap: () => {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => StuffEdit(stuff: stuff)))
+          }
         ),
       ],
     );
