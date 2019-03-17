@@ -27,12 +27,7 @@ class StuffViewState extends State<StuffView> {
     super.initState();
 
     if(this.stuff.picture != null) {
-      FirebaseStorage.instance.ref().child(stuff.picture).getDownloadURL().then((onValue) {
-        setState(() {
-          print(onValue);
-          imageDownloadUrl = onValue;
-        });
-      });
+      imageDownloadUrl = stuff.picture;
     }
   }
 

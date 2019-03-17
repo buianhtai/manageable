@@ -7,6 +7,7 @@ import 'package:flutter_tags/input_tags.dart';
 import 'package:intl/intl.dart';
 import 'package:manageable/common/constants.dart';
 import 'package:manageable/common/image_file.dart';
+import 'package:manageable/core/image_compressor.dart';
 import 'package:manageable/stuff/constants.dart';
 import 'package:manageable/stuff/stuff.dart';
 import 'package:flutter/foundation.dart';
@@ -15,8 +16,7 @@ import 'package:manageable/stuff/service.dart' as service;
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
-import 'package:image/image.dart' as im;
-
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class StuffEdit extends StatefulWidget {
   final Stuff stuff;
@@ -31,6 +31,8 @@ class StuffEdit extends StatefulWidget {
 
 class StuffEditState extends State<StuffEdit> {
   final _formKey = GlobalKey<FormState>();
+
+  bool isSaving = false;
 
   Stuff stuff;
 
@@ -63,14 +65,10 @@ class StuffEditState extends State<StuffEdit> {
       _tags = this.stuff.tags;
 
       if(this.stuff.picture != null) {
-        FirebaseStorage.instance.ref().child(stuff.picture).getDownloadURL().then((onValue) {
-          setState(() {
-            print(onValue);
-            ImageFile f = ImageFile();
-            f.downloadUrl = onValue;
-            images.add(f);
-          });
-        });
+        ImageFile f = ImageFile();
+        f.downloadUrl = this.stuff.picture;
+        f.thumbnailDownloadUrl = this.stuff.thumbnail;
+        images.add(f);
       }
     }
   }
@@ -89,27 +87,28 @@ class StuffEditState extends State<StuffEdit> {
     }
   }
 
-  Uint8List compressImage(File imageFile) {
-    im.Image image = im.decodeImage(imageFile.readAsBytesSync());
-
-    im.Image thumbnail = im.copyResize(image, 1080);
-
-    Uint8List uint8List = im.encodeJpg(thumbnail);
-    return uint8List;
-  }
-
   _setImage(File f) {
-    Uint8List compressFiled = compressImage(f);
+    setState(() {
+      isSaving = true;
+    });
+
+    Uint8List imageData = compressImage(f.readAsBytesSync(), HD_SIZE);
+    Uint8List thumbnailImageData = compressImage(imageData, THUMBNAIL_SIZE);
+
     setState(() {
       ImageFile imageFile = ImageFile();
-      imageFile.file = f;
-      imageFile.data = compressFiled;
+      imageFile.data = imageData;
+      imageFile.thumbnailData = thumbnailImageData;
 
       // TODO support one image by now
       if(images.isNotEmpty) {
         images.removeLast();
       }
       images.add(imageFile);
+
+      setState(() {
+        isSaving = false;
+      });
     });
   }
 
@@ -134,8 +133,13 @@ class StuffEditState extends State<StuffEdit> {
           ),
           IconButton(
             onPressed: () {
+              setState(() {
+                isSaving = true;
+              });
               saveStuff().then((onValue) {
-                print(onValue);
+                setState(() {
+                  isSaving = false;
+                });
 
                 Navigator.pop(context, null);
               });
@@ -144,8 +148,10 @@ class StuffEditState extends State<StuffEdit> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
+      body: ModalProgressHUD(
+          inAsyncCall: isSaving,
+          child: SingleChildScrollView(
+            child: Padding(
           padding: new EdgeInsets.all(20.0),
           child: Form(
             key: _formKey,
@@ -253,7 +259,7 @@ class StuffEditState extends State<StuffEdit> {
               ],
             ),
           )
-        )
+        ))
       )
     );
   }
@@ -266,7 +272,8 @@ class StuffEditState extends State<StuffEdit> {
       'price': _priceTextController.text.isEmpty ? double.parse('0.0') : double.parse(_priceTextController.text),
       'currency': _currency,
       'boughtDate': _boughtDate.millisecondsSinceEpoch,
-      'picture': images.isEmpty ? null: stuff.picture,
+      'picture': (images.isEmpty || this.stuff == null) ? null: stuff.picture,
+      'thumbnail': (images.isEmpty || this.stuff == null) ? null: stuff.thumbnail,
       'tags': _tags,
     };
 
@@ -284,32 +291,51 @@ class StuffEditState extends State<StuffEdit> {
         return Future.value();
       }
       // remove image
+      await FirebaseStorage.instance.ref().child(stuff.thumbnail).delete();
       return FirebaseStorage.instance.ref().child(stuff.picture).delete();
     }
 
     // stuff is updated but keep the picture
-    if(images.elementAt(0).downloadUrl != null) {
+    if(!isNewImageUploaded()) {
       return Future.value(0);
     }
 
     // remove old image
-    if(stuff.picture != null) {
+    if(stuff != null && stuff.picture != null) {
       await FirebaseStorage.instance.ref().child(stuff.picture).delete();
+      await FirebaseStorage.instance.ref().child(stuff.thumbnail).delete();
     }
 
     // upload new image
-    return uploadImage(documentReference.documentID).then((onValue) {
-      documentReference.setData({'picture': onValue.ref.path}, merge: true);
-      return Future.value();
+    return uploadImage(documentReference.documentID).then((iValue) {
+      return uploadThumbnailImage(documentReference.documentID).then((tValue) {
+        return documentReference.setData({
+              'picture': iValue,
+              'thumbnail': tValue}, merge: true);
+      });
     });
   }
 
-  Future<StorageTaskSnapshot> uploadImage(stuffId) {
+  isNewImageUploaded() {
+    return images.isNotEmpty && images.elementAt(0).downloadUrl == null;
+  }
+
+  Future<dynamic> uploadImage(stuffId) {
     StorageReference reference = FirebaseStorage.instance.ref().child(stuffId);
 
     StorageUploadTask task = reference.putData(images.elementAt(0).data);
-    Future<StorageTaskSnapshot> snapshot = task.onComplete;
-    return snapshot;
+    return task.onComplete.then((taskSnapshot) {
+      return taskSnapshot.ref.getDownloadURL();
+    });
+  }
+
+  Future<dynamic> uploadThumbnailImage(stuffId) {
+    StorageReference reference = FirebaseStorage.instance.ref().child('thumb_' + stuffId);
+
+    StorageUploadTask task = reference.putData(images.elementAt(0).thumbnailData);
+    return task.onComplete.then((taskSnapshot) {
+      return taskSnapshot.ref.getDownloadURL();
+    });
   }
 
   void _onCurrencyChange(String selectedCurrency) {

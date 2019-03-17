@@ -1,11 +1,9 @@
-import 'dart:io';
-
 import 'dart:typed_data';
 
 class ImageFile {
-  File file;
-
+  String thumbnailDownloadUrl;
   String downloadUrl;
 
   Uint8List data;
+  Uint8List thumbnailData;
 }

@@ -7,6 +7,7 @@ class Stuff {
   final int boughtDate;
   final double price;
   final String currency;
+  final String thumbnail;
   final String picture;
   final List<String> tags;
   final String uid;
@@ -20,6 +21,7 @@ class Stuff {
         price = map['price'],
         currency = map['currency'],
         uid = map['uid'],
+        thumbnail = map['thumbnail'],
         picture = map['picture'],
         tags = (map['tags'] != null) ? (map['tags'].cast<String>() as List<String>) : Iterable.empty();
 

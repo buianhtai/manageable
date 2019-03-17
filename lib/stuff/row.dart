@@ -22,11 +22,12 @@ class StuffRow extends StatelessWidget {
       actionExtentRatio: 0.25,
       child: Container(
         child: ListTile(
-//          leading: CircleAvatar(
-//            backgroundColor: Colors.indigoAccent,
-//            child: new Text('$3'),
-//            foregroundColor: Colors.white,
-//          ),
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(10.0),
+            child: stuff.thumbnail != null
+                ? Image.network(stuff.thumbnail, height: 50,)
+                : Icon(Icons.image),
+          ),
           title: new Text('${stuff.title}'),
           subtitle: new Text('${stuff.description}'),
         ),
