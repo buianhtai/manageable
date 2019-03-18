@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:manageable/budget/home.dart';
+import 'package:manageable/focus/home.dart';
+import 'package:manageable/notebooks/home.dart';
 import 'package:manageable/root_page.dart';
 
 import 'package:manageable/stuff/home.dart';
@@ -34,6 +36,8 @@ class MyApp extends StatelessWidget {
         '/':         (BuildContext context) => RootPage(),
         '/stuffs': (BuildContext context) => StuffHomePage(),
         '/budget': (BuildContext context) => BudgetHomePage(),
+        '/focus': (BuildContext context) => FocusHomePage(),
+        '/notebooks': (BuildContext context) => NotebookHomePage(),
       },
     );
   }

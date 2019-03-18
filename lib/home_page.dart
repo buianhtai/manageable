@@ -33,8 +33,8 @@ class HomeState extends State<HomePage> {
           children: <Widget>[
             makeDashboardItem('My Stuffs', Icons.branding_watermark, Colors.pinkAccent, '/stuffs'),
             makeDashboardItem('Budget Tracker', Icons.attach_money, Colors.green, '/budget'),
-            makeDashboardItem('Things To Do', Icons.assessment, Colors.blue, '/'),
-            makeDashboardItem('Notebooks & Ideas', Icons.note, Colors.yellow, '/')
+            makeDashboardItem('Focus', Icons.remove_red_eye, Colors.blue, '/focus'),
+            makeDashboardItem('Notebooks', Icons.note, Colors.yellow, '/notebooks')
           ],
         ),
       ),

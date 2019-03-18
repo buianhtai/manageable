@@ -169,25 +169,6 @@ class StuffEditState extends State<StuffEdit> {
                   ),
                   controller: _titleTextController,
                 ),
-                DropdownButton<String>(
-                  items: CATEGORIES.map((c) => DropdownMenuItem<String>(
-                    value: '$c',
-                    child: Text('$c'),
-                  )).toList(),
-                  value: _category,
-                  onChanged: _onCategoryChange,
-                ),
-                DateTimePickerFormField(
-                  format: DateFormat(DATE_FORMAT),
-                  decoration: InputDecoration(
-                    labelText: 'Bought date'
-                  ),
-                  initialValue: _boughtDate,
-                  dateOnly: true,
-                  onChanged: (d) {
-                    _boughtDate = d;
-                  },
-                ),
                 DateTimePickerFormField(
                   format: DateFormat(DATE_FORMAT),
                   decoration: InputDecoration(
@@ -198,6 +179,14 @@ class StuffEditState extends State<StuffEdit> {
                   onChanged: (d) {
                     _lastUsed = d;
                   },
+                ),
+                DropdownButton<String>(
+                  items: CATEGORIES.map((c) => DropdownMenuItem<String>(
+                    value: '$c',
+                    child: Text('$c'),
+                  )).toList(),
+                  value: _category,
+                  onChanged: _onCategoryChange,
                 ),
                 TextField(
                   decoration: InputDecoration(
@@ -214,6 +203,17 @@ class StuffEditState extends State<StuffEdit> {
                   )).toList(),
                   value: _currency,
                   onChanged: _onCurrencyChange,
+                ),
+                DateTimePickerFormField(
+                  format: DateFormat(DATE_FORMAT),
+                  decoration: InputDecoration(
+                      labelText: 'Bought date'
+                  ),
+                  initialValue: _boughtDate,
+                  dateOnly: true,
+                  onChanged: (d) {
+                    _boughtDate = d;
+                  },
                 ),
                 TextFormField(
                   decoration: InputDecoration(

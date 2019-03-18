@@ -40,11 +40,17 @@ class HomeMenu extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.assignment),
-            title: Text('Things To Do'),
+            title: Text('Focus'),
+              onTap: () {
+                Navigator.popAndPushNamed(context, "/focus");
+              }
           ),
           ListTile(
             leading: Icon(Icons.note),
-            title: Text('Notebooks & Ideas'),
+            title: Text('Notebooks'),
+              onTap: () {
+                Navigator.popAndPushNamed(context, "/notebooks");
+              }
           ),
           Divider(),
           ListTile(

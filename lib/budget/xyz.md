@@ -1,0 +1,1 @@
+A [simple chart](https://google.github.io/charts/flutter/example/bar_charts/simple) for all accounts, each account is a column.
